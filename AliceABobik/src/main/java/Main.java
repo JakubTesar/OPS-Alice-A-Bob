@@ -1,7 +1,4 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
     //private key
@@ -58,13 +55,18 @@ public class Main {
     }
 
     public static List<Long> getBinaryFromText(String text) {
-        String bin = "";
-        for (int i = 0; i < text.length(); i++) {
-            bin += Integer.toBinaryString(text.charAt(i));
-        }
+        String bin1 = "";
+        String bin2 = "";
+        bin1 += Integer.toBinaryString(text.charAt(0));
+        bin2 += Integer.toBinaryString(text.charAt(1));
+
+        if (bin1.length() >= 7) bin1 = "0" + bin1;
+        if (bin2.length() >= 7) bin2 = "0" + bin2;
         List<Long> list = new ArrayList<>();
-        for (long i = 0; i < bin.length(); i++)
-            list.add(Long.parseLong(String.valueOf(bin.charAt((int) i))));
+        for (long i = 0; i < bin1.length(); i++)
+            list.add(Long.parseLong(String.valueOf(bin1.charAt((int) i))));
+        for (long i = 0; i < bin2.length(); i++)
+            list.add(Long.parseLong(String.valueOf(bin2.charAt((int) i))));
         return list;
     }
 
@@ -81,21 +83,27 @@ public class Main {
         return 0;
     }
 
-    public static char encryptLetter(long u, int vMinus, List<Long> spA, long decryptNumSum) {
+    public static String encryptLetter(long u, int vMinus, List<Long> spA, long decryptNumSum) {
         long magic = decryptNumSum * vMinus % u;
-        String binBack = "";
+        StringBuilder binBack = new StringBuilder();
         for (Long aLong : spA) {
-            if (magic >= aLong) {
-                binBack += (1);
+            if (magic - aLong >= 0) {
+                binBack.append(1);
                 magic -= aLong;
             } else {
-                binBack += (0);
+                binBack.append(0);
             }
         }
-        return (char) Integer.parseInt(binBack, 2);
+        char c1 = (char) (Integer.parseInt(binBack.substring(0, 8), 2));
+        char c2 = (char) (Integer.parseInt(binBack.substring(8), 2));
+        String a = String.valueOf(c1);
+        a += String.valueOf(c2);
+        return a;
     }
 
     public static void main(String[] args) {
+        Locale.setDefault(new Locale("CZ", "cs"));
+
         long l = 16;
         List<Long> spA = superPosA(l);
         Long u = createU(spA);
@@ -121,7 +129,7 @@ public class Main {
                 System.out.println("Vybral jsi Alici ☺");
                 System.out.println("-----------------");
                 System.out.println("Public key:");
-                for (Long a : spA) System.out.print(a + " ,");
+                for (Long a : spB) System.out.print(a + " ,");
                 System.out.println();
                 System.out.println("-----------------");
                 System.out.println("Zadej císla, které si dostal od Boba, oddělené cárkami. Napr. 41641641,208157684,014530");
@@ -129,10 +137,11 @@ public class Main {
                 String numbersFromBobS = sc.nextLine().trim();
                 String[] arrNumBobNums = numbersFromBobS.split(",");
                 List<Long> realNumsFromBob = new ArrayList<>();
+                int vMinus = vMinus(v,u);
                 for (String s : arrNumBobNums)
-                    realNumsFromBob.add(Long.parseLong(s));
+                    realNumsFromBob.add(Long.parseLong(s.trim()));
                 for (Long num : realNumsFromBob) {
-                    System.out.print(encryptLetter(u, vMinus(v, u), spA, decryptLetter(spB, getBinaryFromText(num.toString()))));
+                    System.out.print(encryptLetter(u ,vMinus, spA, num));
                 }
             } else if (answer == 2) {
                 System.out.println("Vybral jsi Bobíka ☻");
@@ -153,7 +162,6 @@ public class Main {
                 for (int i = 0; i < m.length(); i += 2) {
                     for (int j = 0; j < 2; j++) {
                         System.out.print(decryptLetter(spB, getBinaryFromText(m.substring(i, i + 2))) + " ,");
-
                     }
                 }
                 System.out.println();
