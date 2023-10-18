@@ -55,14 +55,14 @@ public class Main {
     }
 
     public static List<Long> getBinaryFromText(String text) {
+        //text = text.isEmpty() ? text+" " : text;
+        List<Long> list = new ArrayList<>();
         String bin1 = "";
         String bin2 = "";
         bin1 += Integer.toBinaryString(text.charAt(0));
         bin2 += Integer.toBinaryString(text.charAt(1));
-
         if (bin1.length() >= 7) bin1 = "0" + bin1;
         if (bin2.length() >= 7) bin2 = "0" + bin2;
-        List<Long> list = new ArrayList<>();
         for (long i = 0; i < bin1.length(); i++)
             list.add(Long.parseLong(String.valueOf(bin1.charAt((int) i))));
         for (long i = 0; i < bin2.length(); i++)
@@ -71,8 +71,8 @@ public class Main {
     }
 
     public static long decryptLetter(List<Long> spB, List<Long> bin) {
-        long sum = 0;
-        for (int i = 0; i < spB.size(); i++)
+        long sum = 0; // ahoj jak se mas
+        for (int i = 0; i < bin.size(); i++)
             sum += (spB.get(i) * bin.get(i));
         return sum;
     }
@@ -86,7 +86,8 @@ public class Main {
     public static String encryptLetter(long u, int vMinus, List<Long> spA, long decryptNumSum) {
         long magic = decryptNumSum * vMinus % u;
         StringBuilder binBack = new StringBuilder();
-        for (Long aLong : spA) {
+        for (int i = spA.size() - 1; i >= 0; i--) {
+            Long aLong = spA.get(i);
             if (magic - aLong >= 0) {
                 binBack.append(1);
                 magic -= aLong;
@@ -94,7 +95,7 @@ public class Main {
                 binBack.append(0);
             }
         }
-        char c1 = (char) (Integer.parseInt(binBack.substring(0, 8), 2));
+        char c1 = (char) (Integer.parseInt(binBack.reverse().substring(0, 8), 2));
         char c2 = (char) (Integer.parseInt(binBack.substring(8), 2));
         String a = String.valueOf(c1);
         a += String.valueOf(c2);
@@ -102,8 +103,6 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        Locale.setDefault(new Locale("CZ", "cs"));
-
         long l = 16;
         List<Long> spA = superPosA(l);
         Long u = createU(spA);
@@ -120,7 +119,7 @@ public class Main {
         System.out.println("\n--------------");
 
         int pokracovani = 1;
-        while (pokracovani ==1) {
+        while (pokracovani == 1) {
             Scanner sc = new Scanner(System.in);
             System.out.println("Alice ☺ 1)");
             System.out.println("Bobík ☻ 2)");
@@ -137,11 +136,11 @@ public class Main {
                 String numbersFromBobS = sc.nextLine().trim();
                 String[] arrNumBobNums = numbersFromBobS.split(",");
                 List<Long> realNumsFromBob = new ArrayList<>();
-                int vMinus = vMinus(v,u);
+                int vMinus = vMinus(v, u);
                 for (String s : arrNumBobNums)
                     realNumsFromBob.add(Long.parseLong(s.trim()));
                 for (Long num : realNumsFromBob) {
-                    System.out.print(encryptLetter(u ,vMinus, spA, num));
+                    System.out.print(encryptLetter(u, vMinus, spA, num));
                 }
             } else if (answer == 2) {
                 System.out.println("Vybral jsi Bobíka ☻");
@@ -161,12 +160,15 @@ public class Main {
                 System.out.println("Zašifrovaná zpráva:");
                 for (int i = 0; i < m.length(); i += 2) {
                     for (int j = 0; j < 2; j++) {
-                        System.out.print(decryptLetter(spB, getBinaryFromText(m.substring(i, i + 2))) + " ,");
+                        //if (i % 2 == 0)
+                            System.out.print(decryptLetter(spB, getBinaryFromText(m.substring(i, i + 2))) + " ,");
+                       // else System.out.print(decryptLetter(spB, getBinaryFromText(m.substring(i, i + 2))) + " ,");
                     }
                 }
                 System.out.println();
 
             }
+            System.out.println();
             System.out.println("chceš znova? 1/0");
             pokracovani = Integer.parseInt(sc.nextLine());
         }
